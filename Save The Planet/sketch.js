@@ -1,43 +1,89 @@
 var alien;
 var bg;
 var alienImage;
-var gaurdian;
-var gaurdianImage
+var warrior;
+var warriorImage
+var alienGroup;
+var score = 0;
+var blackhole;
+var blackholeGroup;
+var blackholeImage;
+var gameState = "start";
+var GameOverImage;
+var GOsound;
+var Ssound;
 
 function preload() {
  bg = loadImage("BG2.jpg")
  alienImage = loadImage("alien.png")
- gaurdianImage = loadImage("Gaurdian.png")
+ warriorImage = loadImage("warrior.png")
+ GameOverImage = loadImage("GameOver.jpg")
+ blackholeImage = loadImage("blackhole.png")
+ GOsound = loadSound("GameOverSound.wav")
+ Ssound = loadSound("Swordsound.wav")
 }
 
 function setup() {
   createCanvas(displayWidth,displayHeight);
-  gaurdian = createSprite(displayWidth-100,displayHeight/2+100,40,40);
-  gaurdian.addImage(gaurdianImage);
-  gaurdian.scale = 0.2;
+  warrior = createSprite(displayWidth-100,displayHeight/2+100,40,40);
+  warrior.addImage(warriorImage);
+  warrior.scale = 0.2;
+
+  alienGroup = new Group();
+  blackholeGroup = new Group();
+
 }
 
 function draw() {
   background(bg);
-  if(World.frameCount%60 === 0) {
+  if(World.frameCount%80 === 0) {
      alien = createSprite(-10,random(30,800),20,20);
      alien.addImage(alienImage);
      alien.scale = 0.2;
-     alien.velocityX =6; 
-    }
-  
-    if(keyDown(UP_ARROW)) {
-      gaurdian.y = gaurdian.y-5;
-    }
-    if(keyDown(DOWN_ARROW)) {
-      gaurdian.y = gaurdian.y+5;
-    }
-    if(keyDown(RIGHT_ARROW)) {
-      gaurdian.x = gaurdian.x+5;
-    }
-    if(keyDown(LEFT_ARROW)) {
-      gaurdian.x = gaurdian.x-5;
+     alien.velocityX =10; 
+     alienGroup.add(alien);
     }
 
-  drawSprites()
+    if(frameCount%20 === 0) {
+      blackhole = createSprite(random(300,800),-10,10,10);
+      blackhole.addImage(blackholeImage);
+      blackhole.scale = 0.2;
+      blackhole.velocityY = 20;
+      blackhole.shapeColor = "black";
+      blackholeGroup.add(blackhole);
+    }
+
+
+    if(keyDown(UP_ARROW)) {
+      warrior.y = warrior.y-5;
+    }
+    if(keyDown(DOWN_ARROW)) {
+      warrior.y = warrior.y+5;
+    }
+    if(keyDown(RIGHT_ARROW)) {
+      warrior.x = warrior.x+5;
+    }
+    if(keyDown(LEFT_ARROW)) {
+      warrior.x = warrior.x-5;
+    }
+
+    if(alienGroup.isTouching(warrior)) {
+      Ssound.play();
+      alienGroup.destroyEach();
+      score = score+20;
+    } 
+  
+    if(blackholeGroup.isTouching(warrior)) {
+      warrior.destroy();  
+      background(GameOverImage);
+      GOsound.play();
+     alienGroup.setvelocityXEach(0);
+      blackholeGroup.setvelocityXEach(0);
+    }
+  drawSprites();
+  textSize(40);
+  fill("white");
+  text("SCORE  : " + score , 50,50);
+
+
 }
